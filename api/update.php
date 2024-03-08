@@ -1,62 +1,75 @@
 <?php
-if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['id'])) {
     $con = mysqli_connect('localhost', 'root', '', 'student');
-    $id = $_GET['id'];
-    $query = "SELECT * FROM student_data WHERE id = $id";
-    $result = mysqli_query($con, $query);
-    $row = mysqli_fetch_assoc($result);
-}
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $con = mysqli_connect('localhost', 'root', '', 'student');
-    $id = $_POST['id'];
-    $Name = $_POST['Name'];
-    $Roll = $_POST['Roll'];
-    $Email = $_POST['Email'];
-    $Address = $_POST['Address'];
-
-    $query = "UPDATE student_data SET Name='$Name', Roll='$Roll', Email='$Email', Address='$Address' WHERE id = $id";
-    $result = mysqli_query($con, $query);
-
-    if ($result) {
-        header("Location: ../index.php"); // Redirect to index page after successful update
-        exit();
-    } else {
-        echo "Error updating record: " . mysqli_error($con);
+    if(isset($_GET['id'])) {
+        $id = $_GET['id'];
+        $query = "SELECT * FROM student_data WHERE id = $id";
+        $result = mysqli_query($con, $query);
+        $row = mysqli_fetch_assoc($result);
     }
-
-    mysqli_close($con);
-}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script src="../js/jquery.min.js"></script>
 </head>
 <body>
     
-    <form action="./api/update.php" method="POST">
-        <input type="hidden" name="id" value="<?= $row['id'] ?>">
+    <form>
+        <input type="hidden" id="id" value="<?= $row['id'] ?>">
         <div class="mb-3">
             <label class="form-label">Student Name</label>
-            <input type="text" name="Name" class="form-control" value="<?= $row['Name'] ?>">
+            <input type="text" id="Name" name="Name" class="form-control" value="<?= $row['Name'] ?>">
         </div>
         <div class="mb-3">
-        <label class="form-label">Student Roll</label>
-        <input type="number" name="Roll" class="form-control" value="<?= $row['Roll'] ?>">
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Student Email</label>
-        <input type="email" name="Email" class="form-control" value="<?= $row['Email'] ?>">
-    </div>
-    <div class="mb-3">
-        <label class="form-label">Student Address</label>
-        <input type="text" name="Address" class="form-control" value="<?= $row['Address'] ?>">
-    </div>
-    <button type="submit" class="btn btn-primary">Update</button>
-</form>
+            <label class="form-label">Student Roll</label>
+            <input type="number" id="Roll" name="Roll" class="form-control" value="<?= $row['Roll'] ?>">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Student Email</label>
+            <input type="email" id="Email" name="Email" class="form-control" value="<?= $row['Email'] ?>">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Student Address</label>
+            <input type="text" id="Address" name="Address" class="form-control" value="<?= $row['Address'] ?>">
+        </div>
+        <button type="button" onclick="updatedata()" class="btn btn-primary">Update</button>
+    </form>
 
+<script>
+    function updatedata() {
+        let id=$('#id').val();
+        let Name=$('#Name').val();
+        let Roll=$('#Roll').val();
+        let Email=$('#Email').val();
+        let Address=$('#Address').val();
+
+        let data = {
+            id:id,
+            Name: Name,
+            Roll: Roll,
+            Email: Email,
+            Address: Address
+        };
+
+        $.ajax({
+            url:'./update1.php',
+            type: 'POST',
+            data: data,
+            success: function(response){
+                console.log(response);
+                if(response) {
+                    console.log('updated......');
+                    window.location.href = "../index.php";
+                } else {
+                    console.log("Not inserted");   
+                }
+            }   
+        });
+    }
+</script>
 </body>
 </html>
